@@ -1,0 +1,58 @@
+[PLEASE NOTE: THIS DOCUMENT IS MOSTLY AI GENERATED!]
+
+Functional Requirements
+    - Pagination: Implement pagination for large datasets.
+    - Filtering and Sorting: Allow filtering and sorting of data based on specific criteria.
+    - Search: Enable searching for students, courses, teachers, etc.
+    - Role-based Access Control (RBAC): Restrict access to endpoints based on user roles (e.g., admin, teacher, student).
+    - Data Validation: Validate input data to ensure data integrity.
+    - Performance Optimization: Optimize endpoints for performance, especially for frequently accessed data.
+    - Security: Implement robust security measures to protect sensitive data, including:
+    - Input validation to prevent injection attacks
+    - Secure storage of credentials
+    - Regular security audits and vulnerability assessments
+    - Error Handling: Provide clear and informative error messages to help developers troubleshoot issues.
+    - Documentation: Create detailed API documentation, including endpoint descriptions, request/response examples, and error codes.
+
+User roles and permissions:
+    - Administrator: Full access to all system features (?)
+    - Teacher: Access to student information, class management, and communication features
+    - Student: Access to their personal information, grades, and course schedule
+    - Parent: Access to their child's information, grades, and communication features
+
+Magyarul: 
+    - belépés felhasználónév és jelszó párosítással (jogkörök: szülő, tanuló, tanár, adminisztrátor)
+    
+    - Adminisztrátor
+        - Órarendi információk hozzáadás a tanárok és diákok számára
+        - (Osztályok, Tanulók, Tanárok, tantermek, tárgyak) létrehozása, jelentések generálása, teljesítmény ellenőrzése
+        - Tantárgyak -> osztályhoz tartoznak
+        - Tantárgyak -> hallgatókhoz tartoznak adminisztrációs szempontból
+        - Hiányzások -> tanuló, (tantárgy és óra összerendelés), rögzítő tanár
+
+    - Közös órarend osztály szinten -> osztályban tanulók -> tanulóknak órái
+    - Jegyek -> a tanulók osztályához tartozó tárgyak minősítése
+    - Hiányzás: közös órarend szerinti időpontban
+
+    - Grades ()
+
+Függőségek:
+    - órák: id, kezdő időpont, vég időpont
+    - osztály -> tanár (1:0n) <- osztályfőnöki viszony
+    - osztály -> tanuló (1:N)
+    - felhasználók
+    - tanulók, tanárok, adminok - felhasználók (1:1)
+    - osztály -> tantárgy (M:N)
+    - osztály -> tantárgyhoz tartozó óra (órarendi információval) (1:N)
+    - (jegyek - evaluations) tantárgy -> tanuló (M:N)
+    - minősítések?
+    - osztályzat: id, tanuló id, rögzítő tanár id, tantárgy id
+    - hiányzás -> tanuló (órarendi információval) (1:N)
+    - órarendi információ: id, kezdő időpont, vég időpont, tanterem id, tárgy id, osztály id, tantárgy, tanár id, részvétel, házi? - lesson
+
+A házifeladatot hasonlóképpen tároljuk mint a jegyeket abban az értelemben, hogy tárgyakhoz tartoznak, lesz egy
+létrehozó tanár, határidő is.
+
+Felhasználónév + jelszó, jelszó alapállapotnak a felhasználóhoz rendelt tanuló születési dátuma, vesszőkkel elválasztva.
+
+Érdemes az implementációt az adatbázissal kezdeni, az alapok után jöhet a Rest API megvalósítása először identitáskezelés nélküli adminisztrációs feladatok ellátására alkalmas funkcionalitással. - hogy lássuk az alapokat utána jöhet az adatbázis fejlesztése, majd identitáskezelés megvalósítása vagy a funkcionalitás bővítése.

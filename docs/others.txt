@@ -1,0 +1,4 @@
+Backend: NestJS with TypeORM
+Frontend: React + Material UI or Semantic UI (?)
+Database: SQL (MySQL)
+Docs: Postman or Swagger (?)
