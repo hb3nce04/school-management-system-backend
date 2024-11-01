@@ -7,15 +7,61 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-// TODO: 2024.10.28
+// TODO: last update: 2024.11.01 -> sync with draw.io !!!
+// createdAt ? recordedAt
+model Student {
+    id                Int                @id @default(autoincrement())
+    firstName         String
+    lastName          String
+    birthFirstName    String
+    birthLastName     String
+    motherFirstName   String
+    motherLastName    String
+    birthCountry      String
+    birthDate         DateTime           @db.Date()
+    birthCity         String
+    gender            Gender
+    description       String
+    createdAt         DateTime           @default(now())
+    updatedAt         DateTime?
+    userId            Int?
+    classId           Int?
+    user              User?              @relation(fields: [userId], references: [id])
+    class             Class?             @relation(fields: [classId], references: [id])
+    studentIdentity   StudentIdentity?
+    communityServices CommunityService[]
+    evaluations       Evaluation[]
+    caretakers        Caretaker[]
+    attendances       Attendance[]
+}
+
+model StudentIdentity {
+    id                     Int             @id @default(autoincrement())
+    studentNumber          String          @unique @db.VarChar(11)
+    studentCardId          String          @unique @db.VarChar(10)
+    bankAccountNumber      String          @unique @db.VarChar(24)
+    insurranceNumber       String          @unique @db.VarChar(9)
+    personalIdentityNumber String          @unique @db.VarChar(8)
+    studentId              Int             @unique
+    bankAccountTypeId      Int
+    student                Student         @relation(fields: [studentId], references: [id])
+    bankAccountType        BankAccountType @relation(fields: [bankAccountTypeId], references: [id])
+}
+
+// TODO: maybe adding location infos
+model School {
+    id   Int    @id @default(autoincrement())
+    name String
+}
+
 model User {
     id          Int       @id @default(autoincrement())
     username    String
     password    String
-    role        Role
     createdAt   DateTime  @default(now())
-    updatedAt   DateTime?
     lastLoginAt DateTime?
+    updatedAt   DateTime?
+    role        Role
     students    Student[]
 }
 
@@ -28,86 +74,47 @@ model Ring {
 
 model RingTime {
     id        Int      @id @default(autoincrement())
+    startTime DateTime @db.Time()
+    endTime   DateTime @db.Time()
     ringId    Int
-    no        Int
-    startTime DateTime
-    endTime   DateTime
     ring      Ring     @relation(fields: [ringId], references: [id])
 }
 
 model Announcement {
-    id          Int      @id @default(autoincrement())
-    classId     Int
+    id          Int       @id @default(autoincrement())
     title       String
     description String
-    createdAt   DateTime
-    expireAt    DateTime
-    class       Class    @relation(fields: [classId], references: [id])
+    createdAt   DateTime  @default(now())
+    expireAt    DateTime?
+    classId     Int
+    class       Class     @relation(fields: [classId], references: [id])
 }
 
 model CommunityService {
-    id           Int      @id @default(autoincrement())
-    studentId    Int
-    startDate    DateTime
-    endDate      DateTime
-    facilityName String
-    hours        Int
-    task         String
-    description  String
-    recordDate   DateTime
-    student      Student  @relation(fields: [studentId], references: [id])
-}
-
-model StudentIdentity {
-    id                     Int     @id @default(autoincrement())
-    studentId              Int     @unique
-    studentNumber          String
-    bankAccountType        String
-    bankAccountNumber      String
-    insurranceNumber       String
-    studentCardId          String
-    personalIdentityNumber String
-    student                Student @relation(fields: [studentId], references: [id])
-}
-
-model Student {
-    id                Int                @id @default(autoincrement())
-    sheetNumber       Int
-    firstName         String
-    lastName          String
-    bFirstName        String
-    bLastName         String
-    mFirstName        String
-    mLastName         String
-    gender            Gender
-    eduId             String
-    description       String
-    birthCountry      String
-    birthDate         String
-    birthCity         String
-    isActive          Boolean            @default(true)
-    isArchived        Boolean            @default(false)
-    classId           Int?
-    userId            Int?
-    class             Class?             @relation(fields: [classId], references: [id])
-    user              User?              @relation(fields: [userId], references: [id])
-    communityServices CommunityService[]
-    studentIdentity   StudentIdentity?
-    evaluations       Evaluation[]
-    caretakers        Caretaker[]
-    attendances       Attendance[]
+    id                         Int                       @id @default(autoincrement())
+    startDate                  DateTime                  @db.Date()
+    endDate                    DateTime                  @db.Date()
+    hours                      Int
+    task                       String
+    description                String
+    createdAt                  DateTime                  @default(now())
+    studentId                  Int
+    communityServiceFacilityId Int
+    student                    Student                   @relation(fields: [studentId], references: [id])
+    CommunityServiceFacility   CommunityServiceFacility? @relation(fields: [communityServiceFacilityId], references: [id])
 }
 
 model Class {
     id              Int            @id @default(autoincrement())
-    academyYear     String
+    // academyYear     String ?
     name            String
     type            String
-    headTeacherId   Int
-    baseClassroomId Int            @unique
     description     String
-    isFinalYear     Boolean        @default(false)
     maxCapacity     Int            @default(30)
+    isFinalYear     Boolean        @default(false) // ?
+    headTeacherId   Int            @unique
+    baseClassroomId Int            @unique
+    headTeacher     Teacher        @relation(fields: [headTeacherId], references: [id])
     baseClassroom   Classroom      @relation(fields: [baseClassroomId], references: [id])
     students        Student[]
     subjects        Subject[]
@@ -115,75 +122,65 @@ model Class {
 }
 
 model Classroom {
-    id       Int     @id @default(autoincrement())
-    name     String
-    type     String
-    area     Int
-    capacity Int
-    isActive Boolean @default(false)
-
-    class   Class?
-    lessons Lesson[]
+    id              Int           @id @default(autoincrement())
+    name            String
+    area            Int
+    capacity        Int
+    isActive        Boolean       @default(false)
+    classroomTypeId Int
+    class           Class?
+    lessons         Lesson[]
+    classroomType   ClassroomType @relation(fields: [classroomTypeId], references: [id])
 }
 
 model Lesson {
     id          Int          @id @default(autoincrement())
-    subjectId   Int
-    classroomId Int
     name        String
     description String
     dayNo       Int
     timetableNo Int
+    subjectId   Int
+    classroomId Int
+    attendances Attendance[]
     subject     Subject      @relation(fields: [subjectId], references: [id])
     classroom   Classroom    @relation(fields: [classroomId], references: [id])
-    attendances Attendance[]
 }
 
 model Subject {
-    id           Int          @id @default(autoincrement())
-    name         String
-    shortName    String
-    certName     String
-    isMajor      Boolean      @default(true)
-    isPractice   Boolean      @default(false)
-    isCounts     Boolean      @default(false)
-    serialNumber String
-    classId      Int
-    teacherId    Int
-    class        Class        @relation(fields: [classId], references: [id])
-    teacher      Teacher      @relation(fields: [teacherId], references: [id])
-    lessons      Lesson[]
-    evaluations  Evaluation[]
+    id          Int          @id @default(autoincrement())
+    name        String
+    isMajor     Boolean      @default(true) // ?
+    isPractice  Boolean      @default(false) // ?
+    isCounts    Boolean      @default(false) // ?
+    classId     Int
+    teacherId   Int
+    class       Class        @relation(fields: [classId], references: [id])
+    teacher     Teacher      @relation(fields: [teacherId], references: [id])
+    lessons     Lesson[]
+    evaluations Evaluation[]
 }
 
 model Teacher {
     id                  Int          @id @default(autoincrement())
     firstName           String
     lastName            String
+    birthDate           DateTime     @db.Date()
     gender              Gender
+    classes             Class[]
     subjects            Subject[]
     recordedEvaluations Evaluation[]
 }
 
-model EvaluationType {
-    id          Int          @id @default(autoincrement())
-    no          String
-    name        String
-    isProtected Boolean      @default(false)
-    isVisible   Boolean      @default(true)
-    evaluations Evaluation[]
-}
-
 model Evaluation {
     id               Int            @id @default(autoincrement())
+    isActive         Boolean        @default(true) // ?
+    description      String
+    scoreValue       String
+    feedback         String
     studentId        Int
     subjectId        Int
     recordTeacherId  Int
-    isActive         Boolean        @default(true)
-    description      String
     evaluationTypeId Int
-    scoreValue       String
-    feedback         String
     student          Student        @relation(fields: [studentId], references: [id])
     subject          Subject        @relation(fields: [subjectId], references: [id])
     teacher          Teacher        @relation(fields: [recordTeacherId], references: [id])
@@ -200,13 +197,46 @@ model Caretaker {
     student   Student @relation(fields: [studentId], references: [id])
 }
 
+// ? problematic 1 attendances ??? -> many lesson for only one subject
 model Attendance {
     id        Int     @id @default(autoincrement())
+    attended  Boolean @default(true)
     lessonId  Int
     studentId Int
-    attended  Boolean
     lesson    Lesson  @relation(fields: [lessonId], references: [id])
     student   Student @relation(fields: [studentId], references: [id])
+}
+
+// Adatszótárok (indexing tables)
+// értékeléstípusok lekezelése pl szöveges értékelés, számértékelés, százalékos értékelés, osztályzat, stb
+// szöveges értékelések eltárolása (mintaszövegek)
+model EvaluationType {
+    id          Int          @id @default(autoincrement())
+    name        String
+    isProtected Boolean      @default(false)
+    isVisible   Boolean      @default(true)
+    evaluations Evaluation[]
+}
+
+// OTP Bank, K&H Bank, Erste Bank, Raiffeisen Bank, CIB Bank, UniCredit Bank ... stb
+model BankAccountType {
+    id              Int               @id @default(autoincrement())
+    name            String
+    StudentIdentity StudentIdentity[]
+}
+
+// enum [classroom, laboratory, workshop, gym, library, office, other]
+model ClassroomType {
+    id         Int         @id @default(autoincrement())
+    name       String
+    classrooms Classroom[]
+}
+
+// CommunityService ??
+model CommunityServiceFacility {
+    id                Int                @id @default(autoincrement())
+    name              String
+    communityServices CommunityService[]
 }
 
 enum Gender {
