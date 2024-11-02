@@ -7,13 +7,13 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 
   async onModuleInit() {
     await this.$connect()
-      .then(() => this.logger.log('Connected to database'))
+      .then(() => this.logger.log('Connected to the database'))
       .catch((err) => this.logger.error(err));
   }
 
   async onModuleDestroy() {
     await this.$disconnect()
-      .then(() => this.logger.log('Disconnected from database'))
+      .then(() => this.logger.log('Disconnected from the database'))
       .catch((err) => this.logger.error(err));
   }
 }

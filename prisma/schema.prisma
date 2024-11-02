@@ -51,12 +51,12 @@ model StudentIdentity {
 // TODO: maybe adding location infos
 model School {
     id   Int    @id @default(autoincrement())
-    name String
+    name String @unique
 }
 
 model User {
     id          Int       @id @default(autoincrement())
-    username    String
+    username    String    @unique
     password    String
     createdAt   DateTime  @default(now())
     lastLoginAt DateTime?
@@ -67,7 +67,7 @@ model User {
 
 model Ring {
     id        Int        @id @default(autoincrement())
-    name      String
+    name      String     @unique
     isActive  Boolean    @default(false)
     ringTimes RingTime[]
 }
@@ -107,7 +107,7 @@ model CommunityService {
 model Class {
     id              Int            @id @default(autoincrement())
     // academyYear     String ?
-    name            String
+    name            String         @unique
     type            String
     description     String
     maxCapacity     Int            @default(30)
@@ -123,7 +123,7 @@ model Class {
 
 model Classroom {
     id              Int           @id @default(autoincrement())
-    name            String
+    name            String        @unique
     area            Int
     capacity        Int
     isActive        Boolean       @default(false)
@@ -135,7 +135,7 @@ model Classroom {
 
 model Lesson {
     id          Int          @id @default(autoincrement())
-    name        String
+    name        String       @unique
     description String
     dayNo       Int
     timetableNo Int
@@ -148,7 +148,7 @@ model Lesson {
 
 model Subject {
     id          Int          @id @default(autoincrement())
-    name        String
+    name        String       @unique
     isMajor     Boolean      @default(true) // ?
     isPractice  Boolean      @default(false) // ?
     isCounts    Boolean      @default(false) // ?
@@ -199,12 +199,13 @@ model Caretaker {
 
 // ? problematic 1 attendances ??? -> many lesson for only one subject
 model Attendance {
-    id        Int     @id @default(autoincrement())
-    attended  Boolean @default(true)
+    id        Int      @id @default(autoincrement())
+    attended  Boolean  @default(true)
+    lessonAt  DateTime @db.Date()
     lessonId  Int
     studentId Int
-    lesson    Lesson  @relation(fields: [lessonId], references: [id])
-    student   Student @relation(fields: [studentId], references: [id])
+    lesson    Lesson   @relation(fields: [lessonId], references: [id])
+    student   Student  @relation(fields: [studentId], references: [id])
 }
 
 // Adatszótárok (indexing tables)
@@ -212,7 +213,7 @@ model Attendance {
 // szöveges értékelések eltárolása (mintaszövegek)
 model EvaluationType {
     id          Int          @id @default(autoincrement())
-    name        String
+    name        String       @unique // ??
     isProtected Boolean      @default(false)
     isVisible   Boolean      @default(true)
     evaluations Evaluation[]
@@ -225,17 +226,17 @@ model BankAccountType {
     StudentIdentity StudentIdentity[]
 }
 
-// enum [classroom, laboratory, workshop, gym, library, office, other]
+// probably enum for better localization
 model ClassroomType {
     id         Int         @id @default(autoincrement())
-    name       String
+    name       String // classroom, laboratory, workshop, gym, library, office, other
     classrooms Classroom[]
 }
 
 // CommunityService ??
 model CommunityServiceFacility {
     id                Int                @id @default(autoincrement())
-    name              String
+    name              String             @unique
     communityServices CommunityService[]
 }
 
