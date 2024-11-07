@@ -1,13 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
-import { PrismaService } from '../prisma/prisma.service';
-
-function toObject(arr) {
-  var rv = {};
-  for (var i = 0; i < arr.length; ++i) rv[arr[i]] = true;
-  return rv;
-}
+import { PrismaService } from '../../common/modules/prisma/prisma.service';
+import { convertFieldsToPrismaSelect } from '../../common/utils/prisma.util';
 
 @Injectable()
 export class StudentsService {
@@ -17,18 +12,17 @@ export class StudentsService {
     return 'This action adds a new student';
   }
 
-  findAll(includes: string[]) {
-    if (includes.length === 0) {
-      return this.prismaService.student.findMany();
-    }
-    const includeObject = toObject(includes);
+  findAll(fields?: string[]) {
     return this.prismaService.student.findMany({
-      select: includeObject,
+      select: convertFieldsToPrismaSelect(fields),
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} student`;
+  findOne(id: number, fields?: string[]) {
+    return this.prismaService.student.findUnique({
+      where: { id },
+      select: convertFieldsToPrismaSelect(fields),
+    });
   }
 
   update(id: number, updateStudentDto: UpdateStudentDto) {

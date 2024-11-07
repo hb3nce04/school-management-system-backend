@@ -6,10 +6,11 @@ import { UsersModule } from './modules/users/users.module';
 import { StudentsModule } from './modules/students/students.module';
 import { ClassroomsModule } from './modules/classrooms/classrooms.module';
 import { ClassesModule } from './modules/classes/classes.module';
-import { PrismaModule } from './modules/prisma/prisma.module';
+import { PrismaModule } from './common/modules/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { SchoolsModule } from './modules/schools/schools.module';
+import { CaslModule } from './common/modules/casl/casl.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { SchoolsModule } from './modules/schools/schools.module';
     ClassesModule,
     AuthModule,
     SchoolsModule,
+    CaslModule,
   ],
   controllers: [AppController],
   providers: [],

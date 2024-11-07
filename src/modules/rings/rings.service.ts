@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRingDto } from './dto/create-ring.dto';
 import { UpdateRingDto } from './dto/update-ring.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../common/modules/prisma/prisma.service';
 
 @Injectable()
 export class RingsService {

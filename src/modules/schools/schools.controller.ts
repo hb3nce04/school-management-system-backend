@@ -10,7 +10,6 @@ import {
 import { SchoolsService } from './schools.service';
 import { CreateSchoolDto } from './dto/create-school.dto';
 import { UpdateSchoolDto } from './dto/update-school.dto';
-import { Public } from '../../common/decorators/public.decorator';
 
 @Controller('schools')
 export class SchoolsController {
@@ -21,7 +20,6 @@ export class SchoolsController {
     return this.schoolsService.create(createSchoolDto);
   }
 
-  @Public()
   @Get()
   findAll() {
     return this.schoolsService.findAll();

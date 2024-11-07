@@ -7,8 +7,8 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-// TODO: last update: 2024.11.01 -> sync with draw.io !!!
-// createdAt ? recordedAt
+// TODO: last update: 2024.11.03 -> sync with draw.io !!!
+// TODO: joinTables keys
 model Student {
     id                Int                @id @default(autoincrement())
     firstName         String
@@ -22,6 +22,7 @@ model Student {
     birthCity         String
     gender            Gender
     description       String
+    enrollmentDate    DateTime           @db.Date()
     createdAt         DateTime           @default(now())
     updatedAt         DateTime?
     userId            Int?
@@ -48,10 +49,16 @@ model StudentIdentity {
     bankAccountType        BankAccountType @relation(fields: [bankAccountTypeId], references: [id])
 }
 
-// TODO: maybe adding location infos
 model School {
-    id   Int    @id @default(autoincrement())
-    name String @unique
+    id      Int    @id @default(autoincrement())
+    name    String @unique
+    address String
+    city    String
+    state   String
+    zipCode String
+    country String
+    phone   String
+    email   String
 }
 
 model User {
@@ -126,7 +133,6 @@ model Classroom {
     name            String        @unique
     area            Int
     capacity        Int
-    isActive        Boolean       @default(false)
     classroomTypeId Int
     class           Class?
     lessons         Lesson[]
@@ -146,10 +152,11 @@ model Lesson {
     classroom   Classroom    @relation(fields: [classroomId], references: [id])
 }
 
+// or Course
 model Subject {
     id          Int          @id @default(autoincrement())
     name        String       @unique
-    isMajor     Boolean      @default(true) // ?
+    isMajor     Boolean      @default(true) // subsubject
     isPractice  Boolean      @default(false) // ?
     isCounts    Boolean      @default(false) // ?
     classId     Int
@@ -158,6 +165,16 @@ model Subject {
     teacher     Teacher      @relation(fields: [teacherId], references: [id])
     lessons     Lesson[]
     evaluations Evaluation[]
+    syllabuses  Syllabus[]
+}
+
+model Syllabus {
+    id          Int     @id @default(autoincrement())
+    lessonNo    Int // óraszám
+    name        String
+    description String
+    subjectId   Int
+    subject     Subject @relation(fields: [subjectId], references: [id])
 }
 
 model Teacher {
@@ -172,19 +189,18 @@ model Teacher {
 }
 
 model Evaluation {
-    id               Int            @id @default(autoincrement())
-    isActive         Boolean        @default(true) // ?
-    description      String
-    scoreValue       String
-    feedback         String
-    studentId        Int
-    subjectId        Int
-    recordTeacherId  Int
-    evaluationTypeId Int
-    student          Student        @relation(fields: [studentId], references: [id])
-    subject          Subject        @relation(fields: [subjectId], references: [id])
-    teacher          Teacher        @relation(fields: [recordTeacherId], references: [id])
-    evaluationType   EvaluationType @relation(fields: [evaluationTypeId], references: [id])
+    id                 Int            @id @default(autoincrement())
+    description        String
+    scoreValue         String
+    feedback           String
+    studentId          Int
+    subjectId          Int
+    recordingTeacherId Int
+    evaluationTypeId   Int
+    student            Student        @relation(fields: [studentId], references: [id])
+    subject            Subject        @relation(fields: [subjectId], references: [id])
+    teacher            Teacher        @relation(fields: [recordingTeacherId], references: [id])
+    evaluationType     EvaluationType @relation(fields: [evaluationTypeId], references: [id])
 }
 
 model Caretaker {
@@ -202,6 +218,7 @@ model Attendance {
     id        Int      @id @default(autoincrement())
     attended  Boolean  @default(true)
     lessonAt  DateTime @db.Date()
+    createdAt DateTime @default(now())
     lessonId  Int
     studentId Int
     lesson    Lesson   @relation(fields: [lessonId], references: [id])
@@ -226,17 +243,23 @@ model BankAccountType {
     StudentIdentity StudentIdentity[]
 }
 
-// probably enum for better localization
+// enums? for localization
 model ClassroomType {
     id         Int         @id @default(autoincrement())
     name       String // classroom, laboratory, workshop, gym, library, office, other
     classrooms Classroom[]
 }
 
-// CommunityService ??
 model CommunityServiceFacility {
     id                Int                @id @default(autoincrement())
     name              String             @unique
+    address           String
+    city              String
+    state             String
+    zipCode           String
+    country           String
+    phone             String
+    email             String
     communityServices CommunityService[]
 }
 

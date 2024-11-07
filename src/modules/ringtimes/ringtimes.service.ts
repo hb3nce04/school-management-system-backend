@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRingtimeDto } from './dto/create-ringtime.dto';
 import { UpdateRingtimeDto } from './dto/update-ringtime.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../common/modules/prisma/prisma.service';
 
 @Injectable()
 export class RingtimesService {

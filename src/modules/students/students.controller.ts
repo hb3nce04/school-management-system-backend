@@ -7,10 +7,13 @@ import {
   Param,
   Delete,
   Query,
+  UsePipes,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
+import { FieldSelectorPipe } from '../../common/pipes/field-selector.pipe';
 
 @Controller('students')
 export class StudentsController {
@@ -22,14 +25,19 @@ export class StudentsController {
   }
 
   @Get()
-  findAll(@Query('fields') fields: string) {
-    const fieldsArray = fields ? fields.split(',') : [];
-    return this.studentsService.findAll(fieldsArray);
+  findAll(
+    @Query('fields', new FieldSelectorPipe('Student')) fields?: string[],
+  ) {
+    return this.studentsService.findAll(fields);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.studentsService.findOne(+id);
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('fields', new FieldSelectorPipe('Student')) fields?: string[],
+  ) {
+    console.log('asd');
+    return this.studentsService.findOne(id, fields);
   }
 
   @Patch(':id')

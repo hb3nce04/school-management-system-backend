@@ -1,5 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../common/modules/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
@@ -37,11 +37,11 @@ export class AuthService {
     return foundUser;
   }
 
-  async login(user: any) {
+  login(user: any) {
     const payload = { sub: user.id, username: user.username, role: user.role };
+    const token = this.jwtService.sign(payload);
     return {
-      user: { id: user.id, username: user.username, role: user.role }, // for React Context
-      access_token: this.jwtService.sign(payload),
+      token,
     };
   }
 }
